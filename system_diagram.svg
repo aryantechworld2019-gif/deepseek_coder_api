@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" width="900" height="540" font-family="Segoe UI, system-ui, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="540" fill="#0f1117"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" fill="#a78bfa" font-size="18" font-weight="700" letter-spacing="1">DeepSeek Chat — System Architecture</text>
+
+  <!-- ══════════════ BROWSER BOX ══════════════ -->
+  <rect x="40" y="70" width="180" height="340" rx="12" fill="#1a1d27" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="40" y="70" width="180" height="36" rx="12" fill="#a78bfa"/>
+  <rect x="40" y="94" width="180" height="12" fill="#a78bfa"/>
+  <text x="130" y="93" text-anchor="middle" fill="#0f1117" font-size="13" font-weight="700">Browser</text>
+
+  <!-- browser internals -->
+  <rect x="58" y="120" width="144" height="48" rx="8" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="130" y="140" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">chat.html</text>
+  <text x="130" y="156" text-anchor="middle" fill="#777" font-size="10">Login / Sessions / Chat UI</text>
+
+  <rect x="58" y="180" width="144" height="36" rx="8" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="130" y="196" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">fetch()</text>
+  <text x="130" y="210" text-anchor="middle" fill="#777" font-size="10">REST calls to API</text>
+
+  <rect x="58" y="228" width="144" height="48" rx="8" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="130" y="248" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">Session State</text>
+  <text x="130" y="264" text-anchor="middle" fill="#777" font-size="10">username · session_id</text>
+
+  <!-- user icon -->
+  <circle cx="130" cy="330" r="22" fill="#2a2d3a" stroke="#a78bfa" stroke-width="1.5"/>
+  <circle cx="130" cy="322" r="8" fill="#a78bfa"/>
+  <path d="M108 352 Q130 338 152 352" fill="#a78bfa"/>
+  <text x="130" y="370" text-anchor="middle" fill="#777" font-size="10">User</text>
+
+  <!-- ══════════════ FASTAPI BOX ══════════════ -->
+  <rect x="320" y="70" width="260" height="400" rx="12" fill="#1a1d27" stroke="#34d399" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="320" y="70" width="260" height="36" rx="12" fill="#34d399"/>
+  <rect x="320" y="94" width="260" height="12" fill="#34d399"/>
+  <text x="450" y="93" text-anchor="middle" fill="#0f1117" font-size="13" font-weight="700">FastAPI Server  (chat_test.py)</text>
+
+  <!-- endpoints -->
+  <rect x="338" y="118" width="224" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="352" y="136" fill="#34d399" font-size="10" font-weight="700">POST</text>
+  <text x="390" y="136" fill="#e0e0e0" font-size="10">/chat</text>
+  <text x="556" y="136" text-anchor="end" fill="#777" font-size="10">send message</text>
+
+  <rect x="338" y="152" width="224" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="352" y="170" fill="#60a5fa" font-size="10" font-weight="700">GET</text>
+  <text x="383" y="170" fill="#e0e0e0" font-size="10">/sessions/{username}</text>
+  <text x="556" y="170" text-anchor="end" fill="#777" font-size="10">list sessions</text>
+
+  <rect x="338" y="186" width="224" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="352" y="204" fill="#60a5fa" font-size="10" font-weight="700">GET</text>
+  <text x="383" y="204" fill="#e0e0e0" font-size="10">/history/{user}/{sid}</text>
+  <text x="556" y="204" text-anchor="end" fill="#777" font-size="10">load history</text>
+
+  <rect x="338" y="220" width="224" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="352" y="238" fill="#f87171" font-size="10" font-weight="700">DELETE</text>
+  <text x="399" y="238" fill="#e0e0e0" font-size="10">/sessions/{user}/{sid}</text>
+  <text x="556" y="238" text-anchor="end" fill="#777" font-size="10">delete session</text>
+
+  <rect x="338" y="220" width="224" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="352" y="238" fill="#f87171" font-size="10" font-weight="700">DELETE</text>
+  <text x="399" y="238" fill="#e0e0e0" font-size="10">/sessions/{user}/{sid}</text>
+  <text x="556" y="238" text-anchor="end" fill="#777" font-size="10">delete session</text>
+
+  <!-- middleware -->
+  <rect x="338" y="262" width="224" height="36" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="450" y="278" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">CORS Middleware</text>
+  <text x="450" y="292" text-anchor="middle" fill="#777" font-size="10">allow_origins=["*"]</text>
+
+  <!-- threadpool -->
+  <rect x="338" y="310" width="224" height="48" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="450" y="330" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">ThreadPoolExecutor</text>
+  <text x="450" y="346" text-anchor="middle" fill="#777" font-size="10">max_workers=1  · blocks event loop</text>
+
+  <!-- lifespan -->
+  <rect x="338" y="370" width="224" height="36" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="450" y="386" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">Lifespan Handler</text>
+  <text x="450" y="400" text-anchor="middle" fill="#777" font-size="10">load model · init DB · shutdown</text>
+
+  <rect x="338" y="416" width="224" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="450" y="435" text-anchor="middle" fill="#60a5fa" font-size="10">GET  /  → serves chat.html</text>
+
+  <!-- ══════════════ SQLITE BOX ══════════════ -->
+  <rect x="680" y="70" width="180" height="180" rx="12" fill="#1a1d27" stroke="#fbbf24" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="680" y="70" width="180" height="36" rx="12" fill="#fbbf24"/>
+  <rect x="680" y="94" width="180" height="12" fill="#fbbf24"/>
+  <text x="770" y="93" text-anchor="middle" fill="#0f1117" font-size="13" font-weight="700">SQLite</text>
+
+  <rect x="698" y="118" width="144" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="770" y="136" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">chat_ds.db</text>
+
+  <!-- table schema -->
+  <rect x="698" y="154" width="144" height="82" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="770" y="170" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700">chat_history</text>
+  <text x="710" y="186" fill="#777" font-size="9">id   INTEGER PK</text>
+  <text x="710" y="199" fill="#777" font-size="9">user  TEXT</text>
+  <text x="710" y="212" fill="#777" font-size="9">session  TEXT</text>
+  <text x="710" y="225" fill="#777" font-size="9">role  TEXT  ·  content  TEXT</text>
+
+  <!-- ══════════════ MODEL BOX ══════════════ -->
+  <rect x="680" y="300" width="180" height="170" rx="12" fill="#1a1d27" stroke="#f472b6" stroke-width="1.5" filter="url(#shadow)"/>
+  <rect x="680" y="300" width="180" height="36" rx="12" fill="#f472b6"/>
+  <rect x="680" y="324" width="180" height="12" fill="#f472b6"/>
+  <text x="770" y="323" text-anchor="middle" fill="#0f1117" font-size="13" font-weight="700">DeepSeek LLM</text>
+
+  <rect x="698" y="350" width="144" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="770" y="364" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">deepseek-llm-7b-chat</text>
+  <text x="770" y="376" text-anchor="middle" fill="#777" font-size="9">bfloat16 · device_map=auto</text>
+
+  <rect x="698" y="386" width="144" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="770" y="401" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">AutoTokenizer</text>
+  <text x="770" y="413" text-anchor="middle" fill="#777" font-size="9">apply_chat_template</text>
+
+  <rect x="698" y="422" width="144" height="28" rx="6" fill="#0f1117" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="770" y="437" text-anchor="middle" fill="#e0e0e0" font-size="11" font-weight="600">GenerationConfig</text>
+  <text x="770" y="449" text-anchor="middle" fill="#777" font-size="9">max_new_tokens=150</text>
+
+  <!-- ══════════════ ARROWS ══════════════ -->
+
+  <!-- Browser ↔ FastAPI (HTTP REST) -->
+  <line x1="220" y1="185" x2="318" y2="185" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
+  <line x1="318" y1="210" x2="220" y2="210" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
+  <rect x="240" y="172" width="68" height="16" rx="4" fill="#0f1117"/>
+  <text x="274" y="183" text-anchor="middle" fill="#a78bfa" font-size="9">HTTP / REST</text>
+  <rect x="240" y="197" width="68" height="16" rx="4" fill="#0f1117"/>
+  <text x="274" y="208" text-anchor="middle" fill="#a78bfa" font-size="9">JSON response</text>
+
+  <!-- FastAPI → SQLite (save/load) -->
+  <line x1="580" y1="175" x2="678" y2="175" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="678" y1="200" x2="580" y2="200" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="593" y="162" width="72" height="16" rx="4" fill="#0f1117"/>
+  <text x="629" y="173" text-anchor="middle" fill="#fbbf24" font-size="9">save_message</text>
+  <rect x="593" y="187" width="72" height="16" rx="4" fill="#0f1117"/>
+  <text x="629" y="198" text-anchor="middle" fill="#fbbf24" font-size="9">load_history</text>
+
+  <!-- FastAPI → Model (inference) -->
+  <line x1="580" y1="355" x2="678" y2="370" stroke="#f472b6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="678" y1="400" x2="580" y2="385" stroke="#f472b6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="587" y="342" width="78" height="16" rx="4" fill="#0f1117"/>
+  <text x="626" y="353" text-anchor="middle" fill="#f472b6" font-size="9">run_in_executor</text>
+  <rect x="587" y="388" width="78" height="16" rx="4" fill="#0f1117"/>
+  <text x="626" y="399" text-anchor="middle" fill="#f472b6" font-size="9">decoded text</text>
+
+  <!-- ══════════════ LEGEND ══════════════ -->
+  <rect x="40" y="460" width="820" height="60" rx="10" fill="#1a1d27" stroke="#2a2d3a" stroke-width="1"/>
+  <text x="65" y="480" fill="#777" font-size="10" font-weight="600">LEGEND</text>
+  <line x1="120" y1="476" x2="160" y2="476" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <text x="165" y="480" fill="#a78bfa" font-size="10">HTTP REST</text>
+  <line x1="250" y1="476" x2="290" y2="476" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="295" y="480" fill="#fbbf24" font-size="10">SQLite R/W</text>
+  <line x1="375" y1="476" x2="415" y2="476" stroke="#f472b6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="420" y="480" fill="#f472b6" font-size="10">Model Inference (thread)</text>
+
+  <text x="65" y="505" fill="#555" font-size="9">Stack: Python 3.12 · FastAPI · Uvicorn · HuggingFace Transformers · PyTorch bfloat16 · SQLite3</text>
+</svg>

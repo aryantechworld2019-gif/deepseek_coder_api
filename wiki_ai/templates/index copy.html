@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AL1 Chat</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Chat with AL1</h1>
+  <div id="chatBox" class="chat-box"></div>
+
+  <form id="chatForm">
+    <input type="text" id="prompt" placeholder="Type your message..." required>
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const form = document.getElementById("chatForm");
+    const promptInput = document.getElementById("prompt");
+    const user_id = "abc";  // can be dynamic
+
+    function updateChat(messages) {
+      chatBox.innerHTML = "";
+      messages.forEach(msg => {
+        const div = document.createElement("div");
+        div.className = msg.role;
+        div.textContent = `${msg.role === "user" ? "You" : "AL1"}: ${msg.content}`;
+        chatBox.appendChild(div);
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const prompt = promptInput.value.trim();
+      if (!prompt) return;
+
+      const res = await fetch("/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id, prompt })
+      });
+
+      const data = await res.json();
+      updateChat(data.messages);
+      promptInput.value = "";
+    });
+  </script>
+</body>
+</html>

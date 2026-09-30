@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepSeek Chat</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ---- Login / Session screens ---- */
+    .screen {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 16px;
+      padding: 2rem;
+      width: min(420px, 92vw);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .screen h2 { font-size: 1.3rem; color: #a78bfa; }
+    .screen p  { font-size: 0.85rem; color: #777; }
+
+    input[type="text"] {
+      background: #0f1117;
+      border: 1px solid #2a2d3a;
+      border-radius: 8px;
+      color: #e0e0e0;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.95rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus { border-color: #a78bfa; }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.85; }
+
+    .btn-primary { background: #a78bfa; color: #0f1117; font-weight: 600; }
+    .btn-secondary { background: #2a2d3a; color: #e0e0e0; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
+
+    /* ---- Session list ---- */
+    .session-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 260px; overflow-y: auto; }
+    .session-item {
+      background: #0f1117;
+      border: 1px solid #2a2d3a;
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .session-item .meta { font-size: 0.78rem; color: #777; }
+    .session-item .actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+    /* ---- Chat layout ---- */
+    #chat-screen {
+      display: none;
+      flex-direction: column;
+      width: min(720px, 98vw);
+      height: 100vh;
+      padding: 0;
+    }
+
+    .chat-header {
+      background: #1a1d27;
+      border-bottom: 1px solid #2a2d3a;
+      padding: 0.75rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .chat-header .title { font-size: 1rem; font-weight: 600; color: #a78bfa; }
+    .chat-header .sub   { font-size: 0.75rem; color: #555; }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .bubble-wrap {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+    }
+    .bubble-wrap.user  { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .avatar.user      { background: #a78bfa; color: #0f1117; }
+    .avatar.assistant { background: #2a2d3a; color: #a78bfa; }
+
+    .bubble {
+      max-width: 72%;
+      padding: 0.65rem 0.95rem;
+      border-radius: 14px;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .bubble.user      { background: #a78bfa; color: #0f1117; border-bottom-right-radius: 4px; }
+    .bubble.assistant { background: #1a1d27; color: #e0e0e0; border: 1px solid #2a2d3a; border-bottom-left-radius: 4px; }
+
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 0.65rem 0.95rem;
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 14px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+    .typing span {
+      width: 7px; height: 7px;
+      background: #a78bfa;
+      border-radius: 50%;
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30%           { transform: translateY(-6px); }
+    }
+
+    .input-bar {
+      background: #1a1d27;
+      border-top: 1px solid #2a2d3a;
+      padding: 0.85rem 1.2rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+    }
+    #msg-input {
+      flex: 1;
+      resize: none;
+      background: #0f1117;
+      border: 1px solid #2a2d3a;
+      border-radius: 10px;
+      color: #e0e0e0;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      max-height: 140px;
+      overflow-y: auto;
+      line-height: 1.45;
+      transition: border-color 0.2s;
+    }
+    #msg-input:focus { border-color: #a78bfa; }
+    #send-btn {
+      background: #a78bfa;
+      color: #0f1117;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 0.6rem 1.1rem;
+      font-size: 1rem;
+      align-self: flex-end;
+    }
+    #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="screen">
+  <h2>DeepSeek Chat</h2>
+  <p>Enter your username to continue</p>
+  <input id="username-input" type="text" placeholder="Username" autocomplete="off" />
+  <button class="btn-primary" onclick="handleLogin()">Continue</button>
+</div>
+
+<!-- SESSION PICKER -->
+<div id="session-screen" class="screen hidden">
+  <h2>Sessions</h2>
+  <p id="session-greeting"></p>
+  <div class="session-list" id="session-list"></div>
+  <button class="btn-primary" onclick="startNewSession()">+ New Session</button>
+  <button class="btn-secondary" onclick="logout()">Change User</button>
+</div>
+
+<!-- CHAT -->
+<div id="chat-screen">
+  <div class="chat-header">
+    <div>
+      <div class="title">DeepSeek Chat</div>
+      <div class="sub" id="session-label"></div>
+    </div>
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn-secondary btn-sm" onclick="showSessions()">Sessions</button>
+      <button class="btn-secondary btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="input-bar">
+    <textarea id="msg-input" rows="1" placeholder="Type a message…"></textarea>
+    <button id="send-btn" onclick="sendMessage()">&#9658;</button>
+  </div>
+</div>
+
+<script>
+  const API = '';
+  let username = '';
+  let sessionId = null;
+
+  // --- Auto-resize textarea ---
+  const msgInput = document.getElementById('msg-input');
+  msgInput.addEventListener('input', () => {
+    msgInput.style.height = 'auto';
+    msgInput.style.height = Math.min(msgInput.scrollHeight, 140) + 'px';
+  });
+  msgInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  // --- Login ---
+  document.getElementById('username-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  async function handleLogin() {
+    const val = document.getElementById('username-input').value.trim();
+    if (!val) return;
+    username = val;
+    await showSessions();
+  }
+
+  function logout() {
+    username = ''; sessionId = null;
+    show('login-screen');
+    document.getElementById('username-input').value = '';
+  }
+
+  // --- Sessions ---
+  async function showSessions() {
+    show('session-screen');
+    document.getElementById('session-greeting').textContent = `Welcome, ${username}`;
+    const list = document.getElementById('session-list');
+    list.innerHTML = '<p style="color:#555;font-size:0.83rem">Loading…</p>';
+    let sessions = [];
+    try {
+      const res = await fetch(`${API}/sessions/${encodeURIComponent(username)}`);
+      sessions = await res.json();
+    } catch (e) {
+      list.innerHTML = '<p style="color:#ef4444;font-size:0.83rem">Could not load sessions</p>';
+      return;
+    }
+    list.innerHTML = '';
+    if (!sessions.length) {
+      list.innerHTML = '<p style="color:#555;font-size:0.83rem">No past sessions</p>';
+      return;
+    }
+    sessions.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'session-item';
+      item.innerHTML = `
+        <div>
+          <div style="font-size:0.82rem;font-weight:600">${s.session_id.slice(0,8)}&hellip;</div>
+          <div class="meta">${s.started} &bull; ${s.message_count} messages</div>
+        </div>
+        <div class="actions">
+          <button class="btn-secondary btn-sm" onclick="resumeSession('${s.session_id}')">Resume</button>
+          <button class="btn-danger btn-sm" onclick="deleteSession('${s.session_id}', this)">Del</button>
+        </div>`;
+      list.appendChild(item);
+    });
+  }
+
+  async function resumeSession(sid) {
+    sessionId = sid;
+    await openChat();
+    const res = await fetch(`${API}/history/${encodeURIComponent(username)}/${sid}`);
+    const history = await res.json();
+    history.forEach(m => appendBubble(m.role, m.content));
+    scrollBottom();
+  }
+
+  async function startNewSession() {
+    sessionId = null;
+    await openChat();
+  }
+
+  async function deleteSession(sid, btn) {
+    await fetch(`${API}/sessions/${encodeURIComponent(username)}/${sid}`, { method: 'DELETE' });
+    btn.closest('.session-item').remove();
+  }
+
+  // --- Chat ---
+  function openChat() {
+    document.getElementById('messages').innerHTML = '';
+    document.getElementById('session-label').textContent =
+      sessionId ? `Session ${sessionId.slice(0,8)}…` : 'New session';
+    show('chat-screen');
+    msgInput.focus();
+  }
+
+  async function sendMessage() {
+    const text = msgInput.value.trim();
+    if (!text) return;
+    msgInput.value = ''; msgInput.style.height = 'auto';
+    document.getElementById('send-btn').disabled = true;
+
+    appendBubble('user', text);
+    const typing = appendTyping();
+
+    try {
+      const res = await fetch(`${API}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, message: text, session_id: sessionId }),
+      });
+      const data = await res.json();
+      sessionId = data.session_id;
+      document.getElementById('session-label').textContent = `Session ${sessionId.slice(0,8)}…`;
+      typing.remove();
+      appendBubble('assistant', data.response);
+    } catch (err) {
+      typing.remove();
+      appendBubble('assistant', '⚠ Error: could not reach the server.');
+    }
+    document.getElementById('send-btn').disabled = false;
+    scrollBottom();
+  }
+
+  function appendBubble(role, text) {
+    const wrap = document.createElement('div');
+    wrap.className = `bubble-wrap ${role}`;
+    const initial = role === 'user' ? username[0].toUpperCase() : 'AI';
+    wrap.innerHTML = `
+      <div class="avatar ${role}">${initial}</div>
+      <div class="bubble ${role}">${escHtml(text)}</div>`;
+    document.getElementById('messages').appendChild(wrap);
+    scrollBottom();
+    return wrap;
+  }
+
+  function appendTyping() {
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble-wrap assistant';
+    wrap.innerHTML = `
+      <div class="avatar assistant">AI</div>
+      <div class="typing"><span></span><span></span><span></span></div>`;
+    document.getElementById('messages').appendChild(wrap);
+    scrollBottom();
+    return wrap;
+  }
+
+  function scrollBottom() {
+    const m = document.getElementById('messages');
+    m.scrollTop = m.scrollHeight;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function show(id) {
+    ['login-screen','session-screen','chat-screen'].forEach(s => {
+      const el = document.getElementById(s);
+      if (s === id) {
+        el.classList.remove('hidden');
+        el.style.display = 'flex';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  // initialize
+  show('login-screen');
+</script>
+</body>
+</html>

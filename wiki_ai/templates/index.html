@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat with AL1</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f7f7f8;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 1rem;
+      color: #444;
+      background-color: #ffffff;
+      margin: 0;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      font-size: 1rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: #d1e7ff;
+      color: #003366;
+    }
+
+    .assistant {
+      align-self: flex-start;
+      background-color: #e9ecef;
+      color: #212529;
+    }
+
+    .typing::after {
+      content: "⠋";
+      font-size: 1.2rem;
+      animation: dots 1s steps(5, end) infinite;
+      margin-left: 5px;
+    }
+
+    @keyframes dots {
+      0% { content: "⠋"; }
+      20% { content: "⠙"; }
+      40% { content: "⠹"; }
+      60% { content: "⠸"; }
+      80% { content: "⠼"; }
+      100% { content: "⠴"; }
+    }
+
+    form {
+      display: flex;
+      padding: 1rem;
+      background-color: #ffffff;
+      border-top: 1px solid #ccc;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      margin-left: 1rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 1rem;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat with AL1</h1>
+
+  <div id="chatBox" class="chat-box"></div>
+
+  <form id="chatForm">
+    <input type="text" id="prompt" placeholder="Type your message..." autocomplete="off" required />
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const form = document.getElementById("chatForm");
+    const promptInput = document.getElementById("prompt");
+
+    function createMessageElement(role, content) {
+      const div = document.createElement("div");
+      div.className = `message ${role}`;
+      div.textContent = content;
+      return div;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const prompt = promptInput.value.trim();
+      if (!prompt) return;
+
+      // Show user message
+      const userMsg = createMessageElement("user", `You: ${prompt}`);
+      chatBox.appendChild(userMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      promptInput.value = "";
+
+      // Typing animation
+      const typingDiv = createMessageElement("assistant", "AL1 is thinking");
+      typingDiv.id = "typingIndicator";
+      typingDiv.classList.add("typing");
+      chatBox.appendChild(typingDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      try {
+        const res = await fetch("/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+
+        // Remove typing animation
+        const typingElement = document.getElementById("typingIndicator");
+        if (typingElement) typingElement.remove();
+
+        // Add only the latest assistant response
+        const latest = data.messages[data.messages.length - 1];
+        const assistantMsg = createMessageElement("assistant", `AL1: ${latest.content}`);
+        chatBox.appendChild(assistantMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+      } catch (err) {
+        const typingElement = document.getElementById("typingIndicator");
+        if (typingElement) typingElement.remove();
+
+        const errorMsg = createMessageElement("assistant", "❌ AL1 failed to respond.");
+        chatBox.appendChild(errorMsg);
+      }
+    });
+  </script>
+</body>
+</html>

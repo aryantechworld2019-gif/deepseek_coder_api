@@ -1,0 +1,9 @@
+[
+    "https://argoslabs.atlassian.net/wiki/spaces/LCpy/pages/1272956/Dynamic+Python-3.402.913",
+"https://argoslabs.atlassian.net/wiki/spaces/LCpy/pages/1276742/Excel+Formula-2.811.900"
+]
+
+
+
+
+get me url for dyanamic python from above list
